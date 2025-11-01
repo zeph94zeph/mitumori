@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum DocumentType {
+  QUOTATION
+  DELIVERY
+  INVOICE
+  RECEIPT
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Vehicle {
+  id                 String             @id @default(uuid())
+  name               String
+  type               String
+  model              String
+  registrationNumber String             @unique
+  manufacturer       String
+  owner              String
+  status             String
+  inspectionDueDate  DateTime
+  mileage            Int
+  fuelType           String
+  vin                String             @unique
+  purchaseDate       DateTime
+  insuranceInfo      String
+  notes              String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  maintenanceRecords MaintenanceRecord[]
+  inspectionRecords  InspectionRecord[]
+}
+
+model InspectionRecord {
+  id          String   @id @default(uuid())
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicleId   String
+  item        String
+  description String
+  status      String
+  progress    Int
+  performedAt DateTime
+  updatedAt   DateTime  @updatedAt
+  inspectorId String
+}
+
+model MaintenanceRecord {
+  id                String          @id @default(uuid())
+  vehicle           Vehicle         @relation(fields: [vehicleId], references: [id])
+  vehicleId         String
+  serviceDate       DateTime
+  serviceItem       String
+  serviceDescription String
+  engineerId        String
+  manHours          Float
+  laborCost         Float
+  partsCost         Float
+  totalCost         Float
+  notes             String?
+  parts             MaintenancePart[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model MaintenancePart {
+  id                  String            @id @default(uuid())
+  maintenanceRecord   MaintenanceRecord @relation(fields: [maintenanceRecordId], references: [id])
+  maintenanceRecordId String
+  partName            String
+  unitPrice           Float
+  quantity            Int
+}
+
+model Customer {
+  id      String  @id @default(uuid())
+  name    String
+  address String
+  phone   String
+  email   String
+  taxId   String?
+  documents Document[] @relation("DocumentCustomer")
+}
+
+model Issuer {
+  id      String  @id @default(uuid())
+  name    String
+  address String
+  phone   String
+  email   String
+  taxId   String?
+  documents Document[] @relation("DocumentIssuer")
+}
+
+model Document {
+  id        String        @id @default(uuid())
+  type      DocumentType
+  issueDate DateTime
+  dueDate   DateTime
+  customer  Customer      @relation("DocumentCustomer", fields: [customerId], references: [id])
+  customerId String
+  issuer    Issuer        @relation("DocumentIssuer", fields: [issuerId], references: [id])
+  issuerId  String
+  remarks   String?
+  subtotal  Float
+  taxRate   Float
+  tax       Float
+  total     Float
+  lines     DocumentLine[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model DocumentLine {
+  id         String   @id @default(uuid())
+  document   Document @relation(fields: [documentId], references: [id])
+  documentId String
+  itemName   String
+  description String
+  quantity   Int
+  unitPrice  Float
+  amount     Float
+}
