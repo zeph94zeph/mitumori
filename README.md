@@ -94,6 +94,7 @@ The repository is configured for Netlify to build and serve the frontend from th
    - **Build command:** `npm install && npm run build`
    - **Publish directory:** `client/dist`
 3. Ensure the `NODE_VERSION` environment variable is set to `18` (matching the project tooling).
+4. If the backend API is hosted on another domain, set the `VITE_API_URL` environment variable to the API base URL (e.g. `https://api.example.com`).
 
 An SPA redirect rule is provided via `client/public/_redirects` so that client-side routing works correctly in production.
 
