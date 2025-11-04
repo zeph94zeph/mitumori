@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>車両管理ダッシュボード</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <header class="top-bar">
+      <div class="top-bar__content">
+        <div class="identity">
+          <div class="identity__icon">🚚</div>
+          <div>
+            <h1 class="identity__title">フリートマスター</h1>
+            <p class="identity__subtitle">車両の点検・見積・メンテナンスをひとつの画面で</p>
+          </div>
+        </div>
+        <div class="top-bar__actions">
+          <button class="ghost-button" data-open-drawer="notifications">通知 5</button>
+          <div class="avatar">
+            <span class="avatar__initials">RT</span>
+            <span class="avatar__name">RentSupport</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <div class="sidebar__group">
+          <p class="sidebar__caption">ナビゲーション</p>
+          <button class="sidebar__item is-active" data-view="dashboard">ダッシュボード</button>
+          <button class="sidebar__item" data-view="inspections">点検管理</button>
+          <button class="sidebar__item" data-view="estimates">見積管理</button>
+          <button class="sidebar__item" data-view="maintenance">メンテナンス</button>
+        </div>
+        <div class="sidebar__group">
+          <p class="sidebar__caption">クイックアクセス</p>
+          <button class="sidebar__item" data-open-drawer="newInspection">新しい点検予定</button>
+          <button class="sidebar__item" data-open-drawer="newEstimate">見積作成</button>
+          <button class="sidebar__item" data-open-drawer="newMaintenance">整備依頼登録</button>
+        </div>
+      </aside>
+
+      <section class="content">
+        <section class="view is-active" data-section="dashboard">
+          <div class="panel">
+            <div class="panel__header">
+              <h2>全体サマリー</h2>
+              <div class="panel__actions">
+                <button class="ghost-button" data-open-drawer="reports">レポート出力</button>
+                <button class="primary-button" data-open-drawer="newVehicle">新規車両登録</button>
+              </div>
+            </div>
+            <div class="grid grid--summary">
+              <div class="summary-card" data-summary="vehicleCount">
+                <p class="summary-card__label">登録車両</p>
+                <p class="summary-card__value">0</p>
+                <span class="summary-card__trend summary-card__trend--up">+3 今月追加</span>
+              </div>
+              <div class="summary-card" data-summary="inspectionCount">
+                <p class="summary-card__label">今月の点検</p>
+                <p class="summary-card__value">0</p>
+                <span class="summary-card__trend summary-card__trend--alert">2件の期限切れ</span>
+              </div>
+              <div class="summary-card" data-summary="estimateValue">
+                <p class="summary-card__label">見積総額</p>
+                <p class="summary-card__value">¥0</p>
+                <span class="summary-card__trend">先月比 +12%</span>
+              </div>
+              <div class="summary-card" data-summary="maintenanceProgress">
+                <p class="summary-card__label">メンテ進捗</p>
+                <p class="summary-card__value">0%</p>
+                <span class="summary-card__trend">完了/進行中</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid--split">
+            <div class="panel">
+              <div class="panel__header">
+                <h2>今週のアクション</h2>
+                <select class="select" id="action-filter">
+                  <option value="all">すべて</option>
+                  <option value="inspection">点検</option>
+                  <option value="estimate">見積</option>
+                  <option value="maintenance">メンテナンス</option>
+                </select>
+              </div>
+              <ul class="timeline" id="timeline-list"></ul>
+            </div>
+
+            <div class="panel">
+              <div class="panel__header">
+                <h2>車両稼働状況</h2>
+              </div>
+              <table class="data-table" aria-label="車両稼働状況">
+                <thead>
+                  <tr>
+                    <th>車両</th>
+                    <th>拠点</th>
+                    <th>累計走行距離</th>
+                    <th>次回点検</th>
+                    <th>状態</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="vehicle-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" data-section="inspections">
+          <div class="panel">
+            <div class="panel__header">
+              <div>
+                <h2>点検スケジュール</h2>
+                <p class="panel__subtitle">ステータスで絞り込んで作業優先度を確認できます</p>
+              </div>
+              <div class="panel__actions">
+                <select class="select" id="inspection-filter">
+                  <option value="all">すべて</option>
+                  <option value="予定">予定</option>
+                  <option value="実施中">実施中</option>
+                  <option value="完了">完了</option>
+                  <option value="延期">延期</option>
+                </select>
+                <button class="primary-button" data-open-drawer="newInspection">新しい点検予定</button>
+              </div>
+            </div>
+            <table class="data-table" aria-label="点検スケジュール">
+              <thead>
+                <tr>
+                  <th>管理番号</th>
+                  <th>車両</th>
+                  <th>点検種別</th>
+                  <th>予定日</th>
+                  <th>担当者</th>
+                  <th>状態</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="inspection-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view" data-section="estimates">
+          <div class="panel">
+            <div class="panel__header">
+              <div>
+                <h2>見積管理</h2>
+                <p class="panel__subtitle">提案状況を把握し、フォローアップを自動化します</p>
+              </div>
+              <div class="panel__actions">
+                <select class="select" id="estimate-filter">
+                  <option value="all">すべて</option>
+                  <option value="下書き">下書き</option>
+                  <option value="提出済み">提出済み</option>
+                  <option value="承認待ち">承認待ち</option>
+                  <option value="成約">成約</option>
+                  <option value="失注">失注</option>
+                </select>
+                <button class="primary-button" data-open-drawer="newEstimate">見積作成</button>
+              </div>
+            </div>
+            <table class="data-table" aria-label="見積一覧">
+              <thead>
+                <tr>
+                  <th>見積番号</th>
+                  <th>顧客</th>
+                  <th>対象車両</th>
+                  <th>金額</th>
+                  <th>発行日</th>
+                  <th>状態</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="estimate-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view" data-section="maintenance">
+          <div class="panel">
+            <div class="panel__header">
+              <div>
+                <h2>メンテナンス管理</h2>
+                <p class="panel__subtitle">入庫状況や部品手配をひと目で追跡できます</p>
+              </div>
+              <div class="panel__actions">
+                <select class="select" id="maintenance-filter">
+                  <option value="all">すべて</option>
+                  <option value="受付">受付</option>
+                  <option value="進行中">進行中</option>
+                  <option value="完了">完了</option>
+                </select>
+                <button class="primary-button" data-open-drawer="newMaintenance">整備依頼登録</button>
+              </div>
+            </div>
+            <table class="data-table" aria-label="メンテナンス一覧">
+              <thead>
+                <tr>
+                  <th>案件番号</th>
+                  <th>車両</th>
+                  <th>作業内容</th>
+                  <th>入庫日</th>
+                  <th>外注先</th>
+                  <th>状態</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="maintenance-table"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <aside class="drawer" data-drawer hidden>
+      <div class="drawer__header">
+        <h3 class="drawer__title" data-drawer-title>詳細</h3>
+        <button class="ghost-button" data-close-drawer>閉じる</button>
+      </div>
+      <div class="drawer__content" data-drawer-content>
+        <p class="drawer__placeholder">項目を選択すると詳細が表示されます</p>
+      </div>
+    </aside>
+
+    <div class="backdrop" data-backdrop hidden></div>
+
+    <script src="src/app.js" type="module"></script>
+  </body>
+</html>
