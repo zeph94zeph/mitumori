@@ -98,6 +98,16 @@ The repository is configured for Netlify to build and serve the frontend from th
 
 An SPA redirect rule is provided via `client/public/_redirects` so that client-side routing works correctly in production.
 
+#### Netlify Drop / CLI 用のフォルダを生成する
+
+Git 連携を使わずに Netlify へアップロードしたい場合は、以下のコマンドで `netlify-deploy/` フォルダを作成できます。
+
+```bash
+npm run prepare:netlify
+```
+
+コマンド実行後に生成される `netlify-deploy/` フォルダを Zip 化して Netlify Drop にアップロードするか、`netlify deploy --dir=netlify-deploy --prod` で CLI デプロイを行ってください。詳しい手順は `netlify/README.md` を参照してください。
+
 ## API Documentation
 
 Swagger/OpenAPI documentation can be generated using libraries such as `swagger-jsdoc` and `swagger-ui-express`. Integrate under `server/src/app.ts` if required.
