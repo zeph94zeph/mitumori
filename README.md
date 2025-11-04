@@ -84,6 +84,19 @@ npm run test
 npm run build
 ```
 
+### Netlify Deployment
+
+The repository is configured for Netlify to build and serve the frontend from the `client` workspace.
+
+1. Create a new Netlify site and connect this repository.
+2. Use the following build settings (also captured in `netlify.toml`):
+   - **Base directory:** `client`
+   - **Build command:** `npm install && npm run build`
+   - **Publish directory:** `client/dist`
+3. Ensure the `NODE_VERSION` environment variable is set to `18` (matching the project tooling).
+
+An SPA redirect rule is provided via `client/public/_redirects` so that client-side routing works correctly in production.
+
 ## API Documentation
 
 Swagger/OpenAPI documentation can be generated using libraries such as `swagger-jsdoc` and `swagger-ui-express`. Integrate under `server/src/app.ts` if required.
